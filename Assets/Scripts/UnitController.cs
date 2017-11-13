@@ -1,9 +1,16 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Seek))]
 public class UnitController : MonoBehaviour
 {
+    private Seek m_seek;
     private bool m_isSelected;
-    
+
+    private void Start()
+    {
+        m_seek = GetComponent<Seek>();
+    }
+
     private void Update()
     {
         CheckForSelection();
@@ -32,7 +39,7 @@ public class UnitController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit) && hit.transform.gameObject != gameObject)
             {
-                transform.position = hit.point + new Vector3(0, GetComponent<Collider>().bounds.extents.y, 0);
+                m_seek.Target = hit.point + new Vector3(0, GetComponent<Collider>().bounds.extents.y, 0);
             }
         }
     }
