@@ -1,14 +1,19 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Seek))]
+[RequireComponent(typeof(Renderer), typeof(Seek))]
 public class UnitController : MonoBehaviour
 {
+    private Renderer m_renderer;
     private Seek m_seek;
+
     private bool m_isSelected;
 
     private void Start()
     {
+        m_renderer = GetComponent<Renderer>();
         m_seek = GetComponent<Seek>();
+
+        m_isSelected = false;
     }
 
     private void Update()
@@ -26,7 +31,7 @@ public class UnitController : MonoBehaviour
             if (Physics.Raycast(ray, out hit) && hit.transform.gameObject == gameObject)
             {
                 m_isSelected = !m_isSelected;
-                GetComponent<Renderer>().material.color = (m_isSelected ? Color.yellow : Color.white);
+                m_renderer.material.color = (m_isSelected ? Color.yellow : Color.white);
             }
         }
     }
@@ -39,7 +44,9 @@ public class UnitController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit) && hit.transform.gameObject != gameObject)
             {
-                m_seek.Target = hit.point + new Vector3(0, GetComponent<Collider>().bounds.extents.y, 0);
+                m_seek.Target.transform.SetParent(gameObject.transform.parent);
+                m_seek.Target.transform.position = hit.point;
+                m_seek.Target.gameObject.SetActive(true);
             }
         }
     }
