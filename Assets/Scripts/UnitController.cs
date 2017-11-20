@@ -6,48 +6,34 @@ public class UnitController : MonoBehaviour
     private Renderer m_renderer;
     private Seek m_seek;
 
-    private bool m_isSelected;
+    private bool m_selected;
+
+    public bool Selected
+    {
+        get { return m_selected; }
+        set {
+            m_selected = value;
+            m_renderer.material.color = (value ? Color.yellow : Color.white);
+        }
+    }
 
     private void Start()
     {
         m_renderer = GetComponent<Renderer>();
         m_seek = GetComponent<Seek>();
 
-        m_isSelected = false;
+        m_selected = false;
     }
 
-    private void Update()
+    public void ToggleSelected()
     {
-        CheckForSelection();
-        CheckForMoveCommand();
+        Selected = !Selected;
     }
 
-    private void CheckForSelection()
+    public void SetTarget(Vector3 target)
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit) && hit.transform.gameObject == gameObject)
-            {
-                m_isSelected = !m_isSelected;
-                m_renderer.material.color = (m_isSelected ? Color.yellow : Color.white);
-            }
-        }
-    }
-
-    private void CheckForMoveCommand()
-    {
-        if (m_isSelected && Input.GetMouseButtonDown(1))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit) && hit.transform.gameObject != gameObject)
-            {
-                m_seek.Target.transform.SetParent(gameObject.transform.parent);
-                m_seek.Target.transform.position = hit.point;
-                m_seek.Target.gameObject.SetActive(true);
-            }
-        }
+        m_seek.Target.transform.SetParent(gameObject.transform.parent);
+        m_seek.Target.transform.position = target;
+        m_seek.Target.gameObject.SetActive(true);
     }
 }
