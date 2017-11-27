@@ -26,7 +26,7 @@ public class Seek : MonoBehaviour
         Vector3 targetPosition = Target.position + new Vector3(0, m_collider.bounds.extents.y, 0);
 
         // Get the offset from the agent to the target
-        Vector3 offset = Target.position - transform.position;
+        Vector3 offset = targetPosition - transform.position;
 
         // Initially set the desired speed to max speed
         float desiredSpeed = m_speed;
