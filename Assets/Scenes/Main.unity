@@ -671,7 +671,7 @@ MonoBehaviour:
   ColliderContainer: {fileID: 1657149600}
   Sphere: {fileID: 1821036629}
   Size: {x: 55, y: 55}
-  NodeSpacing: 2
+  NodeSpacing: 1
 --- !u!1 &544276248
 GameObject:
   m_ObjectHideFlags: 0
