@@ -28,6 +28,7 @@ public class InputController : MonoBehaviour
                 if (unitController != null)
                 {
                     unitController.ToggleSelected();
+
                     if (unitController.Selected)
                     {
                         m_selectedUnits.Add(hitObject);
@@ -55,8 +56,8 @@ public class InputController : MonoBehaviour
                     if (unitController != null)
                     {
                         unitController.SetTarget(hit.point);
+                        unitController.Selected = false;
                     }
-                    unitController.Selected = false;
                 }
                 m_selectedUnits.Clear();
             }
