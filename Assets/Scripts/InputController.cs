@@ -96,7 +96,28 @@ public class InputController : MonoBehaviour
         int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
 
         Vector3 start = new Vector3();
-        start.x = start.z = -(distance / gridSize);
+        start.x = start.z = -((gridSize-1) * distance)/2;
+        Vector3 end = -start;
+
+        List<Vector3> targets = new List<Vector3>();
+
+        for (float z = start.z; z <= end.z; z += distance)
+        {
+            for (float x = start.x; x <= end.x; x += distance)
+            {
+                targets.Add(target + new Vector3(x, 0, z));
+            }
+        }
+
+        return targets;
+    }
+
+    private static List<Vector3> WeirdLine(List<UnitController> units, Vector3 target, float distance)
+    {
+        int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
+
+        Vector3 start = new Vector3();
+        start.x = start.z = -(distance * gridSize);
         Vector3 end = -start;
 
         List<Vector3> targets = new List<Vector3>();
