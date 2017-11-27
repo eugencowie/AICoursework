@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Renderer), typeof(Seek))]
+[RequireComponent(typeof(Seek))]
 public class UnitController : MonoBehaviour
 {
-    private Renderer m_renderer;
     private Seek m_seek;
 
     private bool m_selected;
@@ -13,13 +12,12 @@ public class UnitController : MonoBehaviour
         get { return m_selected; }
         set {
             m_selected = value;
-            m_renderer.material.color = (value ? Color.yellow : Color.white);
+            gameObject.SetColor(value ? Color.yellow : Color.white);
         }
     }
 
     private void Start()
     {
-        m_renderer = GetComponent<Renderer>();
         m_seek = GetComponent<Seek>();
 
         m_selected = false;
