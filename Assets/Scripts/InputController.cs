@@ -6,7 +6,7 @@ public class InputController : MonoBehaviour
 {
     public LayerMask GroundLayer;
 
-    private List<GameObject> m_selectedUnits = new List<GameObject>();
+    private List<UnitController> m_selectedUnits = new List<UnitController>();
 
     private void Update()
     {
@@ -22,8 +22,7 @@ public class InputController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                GameObject hitObject = hit.transform.gameObject;
-                UnitController unitController = hitObject.GetComponent<UnitController>();
+                UnitController unitController = hit.transform.gameObject.GetComponent<UnitController>();
 
                 if (unitController != null)
                 {
@@ -31,11 +30,11 @@ public class InputController : MonoBehaviour
 
                     if (unitController.Selected)
                     {
-                        m_selectedUnits.Add(hitObject);
+                        m_selectedUnits.Add(unitController);
                     }
                     else
                     {
-                        m_selectedUnits.Remove(hitObject);
+                        m_selectedUnits.Remove(unitController);
                     }
                 }
             }
@@ -50,16 +49,52 @@ public class InputController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, GroundLayer) && m_selectedUnits.Any())
             {
-                foreach (var unit in m_selectedUnits)
+                if (m_selectedUnits.Count < 2)
                 {
-                    UnitController unitController = unit.GetComponent<UnitController>();
-                    if (unitController != null)
-                    {
-                        unitController.SetTarget(hit.point);
-                        unitController.Selected = false;
-                    }
+                    Point(m_selectedUnits.ToList(), hit.point);
                 }
-                m_selectedUnits.Clear();
+                else
+                {
+                    SquareGrid(m_selectedUnits.ToList(), hit.point, 2.0f);
+                }
+            }
+        }
+    }
+
+    private static void Point(List<UnitController> units, Vector3 target)
+    {
+        units.ForEach(u => u.SetTarget(target));
+    }
+
+    private static void SquareGrid(List<UnitController> units, Vector3 target, float distance)
+    {
+        int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
+
+        Vector3 start = new Vector3();
+        start.x = start.z = -(distance / gridSize);
+        Vector3 end = -start;
+
+        List<Vector3> targets = new List<Vector3>();
+        
+        for (float z = start.z; z <= end.z; z += distance)
+        {
+            for (float x = start.x; x <= end.x; x += distance)
+            {
+                targets.Add(target + new Vector3(x, 0, z));
+            }
+        }
+
+        Vector3 current = new Vector3();
+        units.ForEach(u => current += u.gameObject.transform.position);
+        current /= units.Count;
+
+        foreach (var t in targets.OrderByDescending(t => (t - current).sqrMagnitude))
+        {
+            UnitController closest = units.OrderBy(u => (t - u.gameObject.transform.position).sqrMagnitude).FirstOrDefault();
+            if (closest != null)
+            {
+                closest.SetTarget(t);
+                units.Remove(closest);
             }
         }
     }
