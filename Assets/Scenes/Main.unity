@@ -600,6 +600,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ebca0897509be14f807892cdb005483, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GroundLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!4 &696066241
 Transform:
   m_ObjectHideFlags: 0
@@ -675,7 +678,7 @@ GameObject:
   - component: {fileID: 1360800147}
   - component: {fileID: 1360800146}
   - component: {fileID: 1360800145}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

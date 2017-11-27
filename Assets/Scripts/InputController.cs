@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
+    public LayerMask GroundLayer;
+
     private List<GameObject> m_selectedUnits = new List<GameObject>();
 
     private void Update()
@@ -45,7 +47,7 @@ public class InputController : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit) && m_selectedUnits.Any())
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, GroundLayer) && m_selectedUnits.Any())
             {
                 foreach (var unit in m_selectedUnits)
                 {
