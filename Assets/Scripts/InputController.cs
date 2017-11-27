@@ -49,41 +49,26 @@ public class InputController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, GroundLayer) && m_selectedUnits.Any())
             {
+                List<Vector3> targets = null;
                 if (m_selectedUnits.Count < 2)
                 {
-                    Point(m_selectedUnits.ToList(), hit.point);
+                    targets = Point(m_selectedUnits, hit.point);
                 }
                 else
                 {
-                    SquareGrid(m_selectedUnits.ToList(), hit.point, 2.0f);
+                    targets = SquareGrid(m_selectedUnits, hit.point, 2.0f);
+                }
+
+                if (targets != null)
+                {
+                    SetTargets(m_selectedUnits.ToList(), targets);
                 }
             }
         }
     }
 
-    private static void Point(List<UnitController> units, Vector3 target)
+    private static void SetTargets(List<UnitController> units, List<Vector3> targets)
     {
-        units.ForEach(u => u.SetTarget(target));
-    }
-
-    private static void SquareGrid(List<UnitController> units, Vector3 target, float distance)
-    {
-        int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
-
-        Vector3 start = new Vector3();
-        start.x = start.z = -(distance / gridSize);
-        Vector3 end = -start;
-
-        List<Vector3> targets = new List<Vector3>();
-        
-        for (float z = start.z; z <= end.z; z += distance)
-        {
-            for (float x = start.x; x <= end.x; x += distance)
-            {
-                targets.Add(target + new Vector3(x, 0, z));
-            }
-        }
-
         Vector3 current = new Vector3();
         units.ForEach(u => current += u.gameObject.transform.position);
         current /= units.Count;
@@ -97,5 +82,33 @@ public class InputController : MonoBehaviour
                 units.Remove(closest);
             }
         }
+    }
+
+    private static List<Vector3> Point(List<UnitController> units, Vector3 target)
+    {
+        List<Vector3> targets = new List<Vector3>();
+        units.ForEach(u => targets.Add(target));
+        return targets;
+    }
+    
+    private static List<Vector3> SquareGrid(List<UnitController> units, Vector3 target, float distance)
+    {
+        int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
+
+        Vector3 start = new Vector3();
+        start.x = start.z = -(distance / gridSize);
+        Vector3 end = -start;
+
+        List<Vector3> targets = new List<Vector3>();
+
+        for (float z = start.z; z <= end.z; z += distance)
+        {
+            for (float x = start.x; x <= end.x; x += distance)
+            {
+                targets.Add(target + new Vector3(x, 0, z));
+            }
+        }
+
+        return targets;
     }
 }
