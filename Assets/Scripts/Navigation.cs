@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -84,7 +83,7 @@ public class Navigation : MonoBehaviour
 
         return nodes;
     }
-    
+
     private static void ConnectNodes(List<Node> nodes, float nodeSpacing)
     {
         foreach (Node node in nodes)

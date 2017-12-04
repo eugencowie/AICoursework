@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Seek))]
-public class UnitController : MonoBehaviour
+public class Unit : MonoBehaviour
 {
     private Seek m_seek;
 
@@ -10,16 +10,12 @@ public class UnitController : MonoBehaviour
     public bool Selected
     {
         get { return m_selected; }
-        set {
-            m_selected = value;
-            gameObject.SetColor(value ? Color.yellow : Color.white);
-        }
+        set { gameObject.SetColor((m_selected = value) ? Color.yellow : Color.white); }
     }
 
     private void Start()
     {
         m_seek = GetComponent<Seek>();
-
         m_selected = false;
     }
 

@@ -2,11 +2,11 @@
 using System.Linq;
 using UnityEngine;
 
-public class InputController : MonoBehaviour
+public class Input : MonoBehaviour
 {
     public LayerMask GroundLayer;
 
-    private List<UnitController> m_selectedUnits = new List<UnitController>();
+    private List<Unit> m_selectedUnits = new List<Unit>();
 
     private void Update()
     {
@@ -16,13 +16,13 @@ public class InputController : MonoBehaviour
 
     private void CheckSelection()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (UnityEngine.Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                UnitController unitController = hit.transform.gameObject.GetComponent<UnitController>();
+                Unit unitController = hit.transform.gameObject.GetComponent<Unit>();
 
                 if (unitController != null)
                 {
@@ -43,9 +43,9 @@ public class InputController : MonoBehaviour
 
     private void CheckCommand()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (UnityEngine.Input.GetMouseButtonDown(1))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, GroundLayer) && m_selectedUnits.Any())
             {
@@ -67,7 +67,7 @@ public class InputController : MonoBehaviour
         }
     }
 
-    private static void SetTargets(List<UnitController> units, List<Vector3> targets)
+    private static void SetTargets(List<Unit> units, List<Vector3> targets)
     {
         Vector3 current = new Vector3();
         units.ForEach(u => current += u.gameObject.transform.position);
@@ -75,7 +75,7 @@ public class InputController : MonoBehaviour
 
         foreach (var t in targets.OrderByDescending(t => (t - current).sqrMagnitude))
         {
-            UnitController closest = units.OrderBy(u => (t - u.gameObject.transform.position).sqrMagnitude).FirstOrDefault();
+            Unit closest = units.OrderBy(u => (t - u.gameObject.transform.position).sqrMagnitude).FirstOrDefault();
             if (closest != null)
             {
                 closest.SetTarget(t);
@@ -84,19 +84,19 @@ public class InputController : MonoBehaviour
         }
     }
 
-    private static List<Vector3> Point(List<UnitController> units, Vector3 target)
+    private static List<Vector3> Point(List<Unit> units, Vector3 target)
     {
         List<Vector3> targets = new List<Vector3>();
         units.ForEach(u => targets.Add(target));
         return targets;
     }
-    
-    private static List<Vector3> SquareGrid(List<UnitController> units, Vector3 target, float distance)
+
+    private static List<Vector3> SquareGrid(List<Unit> units, Vector3 target, float distance)
     {
         int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
 
         Vector3 start = new Vector3();
-        start.x = start.z = -((gridSize-1) * distance)/2;
+        start.x = start.z = -((gridSize - 1) * distance) / 2;
         Vector3 end = -start;
 
         List<Vector3> targets = new List<Vector3>();
@@ -112,7 +112,7 @@ public class InputController : MonoBehaviour
         return targets;
     }
 
-    private static List<Vector3> WeirdLine(List<UnitController> units, Vector3 target, float distance)
+    private static List<Vector3> WeirdLine(List<Unit> units, Vector3 target, float distance)
     {
         int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
 
