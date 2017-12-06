@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Seek : MonoBehaviour
 {
     public Transform Target;
+    public Action OnArrival;
 
     [SerializeField]
     private float m_speed = 4;
@@ -13,7 +15,7 @@ public class Seek : MonoBehaviour
 
     private Collider m_collider;
     private Rigidbody m_rigidbody;
-
+    
     private void Start()
     {
         m_collider = GetComponent<Collider>();
@@ -49,7 +51,7 @@ public class Seek : MonoBehaviour
         // Disable the target when we get close
         if (offset.magnitude <= 1.01f)
         {
-            Target.gameObject.SetActive(false);
+            OnArrival?.Invoke();
         }
     }
 }

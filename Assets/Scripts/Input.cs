@@ -84,7 +84,7 @@ public class Input : MonoBehaviour
                 Node end = Navigation.GetClosestNode(t);
                 List<Node> path = Navigation.FindPath(start, end);
 
-                closest.SetTarget(t);
+                closest.SetPath(path);
                 units.Remove(closest);
             }
         }
