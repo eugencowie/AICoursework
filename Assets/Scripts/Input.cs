@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Input : MonoBehaviour
 {
+    public Navigation Navigation;
+
     public LayerMask GroundLayer;
 
     private List<Unit> m_selectedUnits = new List<Unit>();
@@ -67,7 +69,7 @@ public class Input : MonoBehaviour
         }
     }
 
-    private static void SetTargets(List<Unit> units, List<Vector3> targets)
+    private void SetTargets(List<Unit> units, List<Vector3> targets)
     {
         Vector3 current = new Vector3();
         units.ForEach(u => current += u.gameObject.transform.position);
@@ -78,6 +80,10 @@ public class Input : MonoBehaviour
             Unit closest = units.OrderBy(u => (t - u.gameObject.transform.position).sqrMagnitude).FirstOrDefault();
             if (closest != null)
             {
+                Node start = Navigation.GetClosestNode(closest.gameObject.transform.position);
+                Node end = Navigation.GetClosestNode(t);
+                List<Node> path = Navigation.FindPath(start, end);
+
                 closest.SetTarget(t);
                 units.Remove(closest);
             }

@@ -4,20 +4,18 @@ using UnityEngine;
 
 public class Node
 {
-    public Transform Transform;
+    public Vector3 Position;
     public List<Connection> Connections;
     public Node Parent;
     public bool Visited;
 
-    public Node(Transform transform)
+    public Node(Vector3 position)
     {
-        Transform = transform;
+        Position = position;
         Connections = new List<Connection>();
         Parent = null;
         Visited = false;
     }
-
-    public Vector3 Position => Transform.position;
 }
 
 public class Connection
@@ -68,11 +66,11 @@ public class Navigation : MonoBehaviour
 
                 if (!colliders.Any(c => c.bounds.Contains(position)))
                 {
-                    GameObject newNode = Instantiate(sphere, transform);
-                    newNode.transform.position = position;
-                    newNode.SetActive(true);
+                    //GameObject newNode = Instantiate(sphere, transform);
+                    //newNode.transform.position = position;
+                    //newNode.SetActive(true);
 
-                    nodes.Add(new Node(newNode.transform));
+                    nodes.Add(new Node(position));
                 }
             }
         }
@@ -112,10 +110,14 @@ public class Navigation : MonoBehaviour
         }
     }
 
+    public Node GetClosestNode(Vector3 point) => GetClosestNode(m_nodes, point);
+
     public static Node GetClosestNode(List<Node> nodes, Vector3 point)
     {
         return nodes.OrderBy(n => (point - n.Position).sqrMagnitude).First();
     }
+
+    public List<Node> FindPath(Node start, Node end) => FindPath(m_nodes, start, end);
 
     public static List<Node> FindPath(List<Node> nodes, Node start, Node end)
     {
@@ -150,7 +152,7 @@ public class Navigation : MonoBehaviour
             }
         }
 
-        return new Queue<Node>(new Node[] { start });
+        return new List<Node>(new Node[] { start });
     }
 
     private static List<Node> ReturnPath(Node node)
