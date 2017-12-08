@@ -4,54 +4,59 @@ using UnityEngine;
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Seek : MonoBehaviour
 {
-    public Transform Target;
-    public Action OnArrival;
+    public Transform target;
+    public Action onArrival;
+    
+    public float maxSpeed = 4;
+    public float arrivalRadius = 2;
 
-    [SerializeField]
-    private float m_speed = 4;
-
-    [SerializeField]
-    private float m_arrivalRadius = 2.0f;
-
-    private Collider m_collider;
-    private Rigidbody m_rigidbody;
+    private new Collider collider;
+    private new Rigidbody rigidbody;
     
     private void Start()
     {
-        m_collider = GetComponent<Collider>();
-        m_rigidbody = GetComponent<Rigidbody>();
+        collider = GetComponent<Collider>();
+        rigidbody = GetComponent<Rigidbody>();
     }
 
     private void FixedUpdate()
     {
-        // Calculate the target position on the ground
-        Vector3 targetPosition = Target.position + new Vector3(0, m_collider.bounds.extents.y, 0);
+        // Get the position and velocity of the agent
+        Vector3 agentPosition = transform.position;
+        Vector3 agentVelocity = rigidbody.velocity;
 
-        // Get the offset from the agent to the target
-        Vector3 offset = targetPosition - transform.position;
+        // Calculate the target position on the ground
+        Vector3 targetPosition = target.position + new Vector3(0, collider.bounds.extents.y, 0);
+
+        // Calculate the offset from the agent to the target
+        Vector3 offset = targetPosition - agentPosition;
 
         // Initially set the desired speed to max speed
-        float desiredSpeed = m_speed;
+        float desiredSpeed = maxSpeed;
 
-        // If within the arrival distance
-        if (offset.magnitude < m_arrivalRadius)
+        // If within the arrival distance, reduce the desired speed
+        if (offset.magnitude < arrivalRadius)
         {
-            desiredSpeed = m_speed * (offset.magnitude / m_arrivalRadius);
+            desiredSpeed = maxSpeed * (offset.magnitude / arrivalRadius);
         }
 
-        // Get the desired velocity for seek and limit to desired speed
+        // Set the desired velocity by taking the direction from agent
+        // to target multiplied by the desired speed
         Vector3 desiredVelocity = offset.normalized * desiredSpeed;
 
-        // Calculate steering velocity and limit it according to how much it can turn
-        Vector3 steeringVelocity = desiredVelocity - m_rigidbody.velocity;
+        // Calculate steering velocity
+        Vector3 steeringVelocity = desiredVelocity - agentVelocity;
 
         // Apply steering velocity
-        m_rigidbody.velocity += steeringVelocity;
+        agentVelocity += steeringVelocity;
 
         // Disable the target when we get close
         if (offset.magnitude <= 1.01f)
         {
-            OnArrival?.Invoke();
+            onArrival?.Invoke();
         }
+
+        // Apply velocity change
+        rigidbody.velocity = agentVelocity;
     }
 }

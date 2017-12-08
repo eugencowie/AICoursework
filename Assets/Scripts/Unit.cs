@@ -20,7 +20,7 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         m_seek = GetComponent<Seek>();
-        m_seek.OnArrival = OnArrival;
+        m_seek.onArrival = OnArrival;
         m_selected = false;
     }
     
@@ -42,9 +42,9 @@ public class Unit : MonoBehaviour
 
     private void SetTarget(Vector3 target)
     {
-        m_seek.Target.transform.SetParent(gameObject.transform.parent);
-        m_seek.Target.transform.position = target;
-        m_seek.Target.gameObject.SetActive(true);
+        m_seek.target.transform.SetParent(gameObject.transform.parent);
+        m_seek.target.transform.position = target;
+        m_seek.target.gameObject.SetActive(true);
     }
 
     private void OnArrival()
