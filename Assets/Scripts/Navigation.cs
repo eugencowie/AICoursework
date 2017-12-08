@@ -6,16 +6,22 @@ public class Node
 {
     public Vector3 Position;
     public List<Connection> Connections;
+
     public Node Parent;
-    public bool Visited;
+    public float G;
+    public float H;
 
     public Node(Vector3 position)
     {
         Position = position;
         Connections = new List<Connection>();
+
         Parent = null;
-        Visited = false;
+        G = Mathf.Infinity;
+        H = Mathf.Infinity;
     }
+
+    public float F => G + H;
 }
 
 public class Connection
@@ -110,67 +116,75 @@ public class Navigation : MonoBehaviour
         }
     }
 
-    public Node GetClosestNode(Vector3 point) => GetClosestNode(m_nodes, point);
-
     public static Node GetClosestNode(List<Node> nodes, Vector3 point)
     {
         return nodes.OrderBy(n => (point - n.Position).sqrMagnitude).First();
     }
 
-    public List<Node> FindPath(Node start, Node end) => FindPath(m_nodes, start, end);
-
     public static List<Node> FindPath(List<Node> nodes, Node start, Node end)
     {
-        foreach (var n in nodes)
+        // Cost from start to start is zero
+        start.G = 0;
+
+        // Heuristic
+        start.H = (end.Position - start.Position).magnitude;
+
+        // Nodes already evaluated
+        List<Node> closedList = new List<Node>();
+
+        // Discovered nodes not yet evaluated
+        List<Node> openList = new List<Node>();
+        openList.Add(start);
+
+        while (openList.Count > 0)
         {
-            n.Parent = null;
-            n.Visited = false;
-        }
-
-        Queue<Node> queue = new Queue<Node>();
-
-        start.Visited = true;
-        queue.Enqueue(start);
-
-        while (queue.Any())
-        {
-            Node current = queue.Dequeue();
+            Node current = openList.OrderBy(n => n.F).First();
 
             if (current == end)
             {
-                return ReturnPath(end);
+                List<Node> path = new List<Node>();
+                while (current.Parent != null)
+                {
+                    path.Add(current);
+                    current = current.Parent;
+                }
+                path.Reverse();
+                return path;
             }
 
-            foreach (Connection connection in current.Connections)
+            openList.Remove(current);
+            closedList.Add(current);
+            
+            foreach (var connection in current.Connections)
             {
-                if (!connection.Node.Visited)
+                // Ignore if connection has already been evaluated
+                if (closedList.Contains(connection.Node))
                 {
-                    connection.Node.Visited = true;
-                    connection.Node.Parent = current;
-                    queue.Enqueue(connection.Node);
+                    continue;
                 }
+
+                if (!openList.Contains(connection.Node))
+                {
+                    openList.Add(connection.Node);
+                }
+
+                float g = current.G + connection.Cost;
+
+                // This is not a better path
+                if (g >= connection.Node.G)
+                {
+                    continue;
+                }
+
+                connection.Node.Parent = current;
+                connection.Node.G = g;
+                connection.Node.H = (end.Position - connection.Node.Position).magnitude;
             }
         }
 
         return new List<Node>(new Node[] { start });
     }
 
-    private static List<Node> ReturnPath(Node node)
-    {
-        List<Node> foundPath = new List<Node>();
-        if (node != null)
-        {
-            foundPath.Add(node);
-
-            while (node.Parent != null)
-            {
-                foundPath.Add(node.Parent);
-                node = node.Parent;
-            }
-
-            // Reverse the path so the start node is at index 0
-            foundPath.Reverse();
-        }
-        return foundPath;
-    }
+    public Node GetClosestNode(Vector3 point) => GetClosestNode(m_nodes, point);
+    public List<Node> FindPath(Node start, Node end) => FindPath(m_nodes, start, end);
 }
