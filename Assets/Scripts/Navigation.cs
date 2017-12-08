@@ -15,7 +15,11 @@ public class Node
     {
         Position = position;
         Connections = new List<Connection>();
+        Reset();
+    }
 
+    public void Reset()
+    {
         Parent = null;
         G = Mathf.Infinity;
         H = Mathf.Infinity;
@@ -123,6 +127,9 @@ public class Navigation : MonoBehaviour
 
     public static List<Node> FindPath(List<Node> nodes, Node start, Node end)
     {
+        // Reset all nodes
+        nodes.ForEach(n => n.Reset());
+
         // Cost from start to start is zero
         start.G = 0;
 
