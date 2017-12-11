@@ -97,16 +97,20 @@ public class Navigation : MonoBehaviour
         {
             // Get a list of nodes which are within a certain radius of this node
             var nearNodes = nodes
-                .Where(n => n != current)
-                .Where(n => (n.Position - current.Position).magnitude <= spacing * 1.5f);
-            
-            // Create connections to 
-            var nearConnections = nearNodes
+                .Where(n => (n.Position - current.Position).magnitude <= spacing * 1.5f)
+                .Where(n => n != current);
+
+            // Use raycasting to check if there is a valid connection to each nearby node
+            var validConnections = nearNodes
+                .Where(n => !Physics.Linecast(current.Position, n.Position, ~ignoreLayer))
+                .Where(n => !Physics.Linecast(n.Position, current.Position, ~ignoreLayer));
+
+            // Create a connection object for each valid connection to another node (the cost
+            // of the connection is set as the distance between the nodes)
+            var nearConnections = validConnections
                 .Select(n => new Connection(n, (n.Position - current.Position).magnitude));
 
-            var validConnections = nearConnections.Where(c => !Physics.Linecast(current.Position, c.Node.Position, ~ignoreLayer) && !Physics.Linecast(c.Node.Position, current.Position, ~ignoreLayer));
-
-            current.Connections.AddRange(validConnections);
+            current.Connections.AddRange(nearConnections);
         }
 
         return nodes;
