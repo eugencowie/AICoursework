@@ -58,7 +58,10 @@ public class Navigation : MonoBehaviour
     
     private static List<Collider> GetColliders(GameObject container)
     {
-        return container.transform.Cast<Transform>().Select(t => t.gameObject.GetComponent<Collider>()).Where(c => c != null && c.gameObject.GetComponent<Unit>() == null).ToList();
+        return container.transform.Cast<Transform>()
+            .Select(t => t.gameObject.GetComponent<Collider>())
+            .Where(c => c != null && c.gameObject.GetComponent<Unit>() == null)
+            .ToList();
     }
 
     private static List<Node> GenerateNodes(List<Collider> colliders, GameObject sphere, Transform transform, Vector3 size, float nodeSpacing)
