@@ -670,7 +670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IgnoreLayer:
     serializedVersion: 2
-    m_Bits: 4
+    m_Bits: 512
   ColliderContainer: {fileID: 1657149600}
   Sphere: {fileID: 1821036629}
   Size: {x: 55, y: 0, z: 55}
