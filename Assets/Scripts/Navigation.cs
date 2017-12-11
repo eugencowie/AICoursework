@@ -64,19 +64,20 @@ public class Navigation : MonoBehaviour
     private static List<Node> GenerateNodes(List<Collider> colliders, GameObject sphere, Transform transform, Vector3 size, float nodeSpacing)
     {
         List<Node> validNodes = new List<Node>();
-        
-        // Calculate the position to start the grid, taking into account that the grid should be centered
+
+        // Calculate the position to start the grid (the grid should be centered)
         Vector3 start = transform.position - (size / 2);
 
         // Calculate the position to end the grid
         Vector3 end = start + size;
-        
+
         for (Vector3 pos = start; pos.z <= end.z; pos.z += nodeSpacing)
         {
             for (pos.y = start.y; pos.y <= end.y; pos.y += nodeSpacing)
             {
                 for (pos.x = start.x; pos.x <= end.x; pos.x += nodeSpacing)
                 {
+                    // If not intersecting any object, add the node to the list of valid nodes
                     if (!colliders.Any(c => c.bounds.Contains(pos)))
                     {
                         validNodes.Add(new Node(pos));
