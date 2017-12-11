@@ -169,9 +169,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62cbd215b120deb40a69a3d38c64ba48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Target: {fileID: 4863521686492138}
-  m_speed: 4
-  m_arrivalRadius: 2
+  target: {fileID: 4863521686492138}
+  maxSpeed: 4
+  arrivalRadius: 2
 --- !u!114 &114636426724587232
 MonoBehaviour:
   m_ObjectHideFlags: 1

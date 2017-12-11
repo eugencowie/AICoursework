@@ -11,52 +11,47 @@ public class Seek : MonoBehaviour
     public float arrivalRadius = 2;
 
     private new Collider collider;
-    private new Rigidbody rigidbody;
+    private Rigidbody agent;
     
     private void Start()
     {
         collider = GetComponent<Collider>();
-        rigidbody = GetComponent<Rigidbody>();
+        agent = GetComponent<Rigidbody>();
     }
 
     private void FixedUpdate()
     {
-        // Get the position and velocity of the agent
-        Vector3 agentPosition = transform.position;
-        Vector3 agentVelocity = rigidbody.velocity;
+        // Set the target position above the actual target to take into account the agent's distance from the floor
+        target.position += new Vector3(0, collider.bounds.extents.y, 0);
 
-        // Calculate the target position on the ground
-        Vector3 targetPosition = target.position + new Vector3(0, collider.bounds.extents.y, 0);
+        // Calculate the distance from the agent to the target
+        float distance = Vector3.Magnitude(target.position - agent.position);
 
-        // Calculate the offset from the agent to the target
-        Vector3 offset = targetPosition - agentPosition;
-
-        // Initially set the desired speed to max speed
+        // Set the desired speed to max speed initially
         float desiredSpeed = maxSpeed;
 
         // If within the arrival distance, reduce the desired speed
-        if (offset.magnitude < arrivalRadius)
+        if (distance < arrivalRadius)
         {
-            desiredSpeed = maxSpeed * (offset.magnitude / arrivalRadius);
+            desiredSpeed = maxSpeed * (distance / arrivalRadius);
         }
-
-        // Set the desired velocity by taking the direction from agent
-        // to target multiplied by the desired speed
-        Vector3 desiredVelocity = offset.normalized * desiredSpeed;
+        
+        // Calculate the desired velocity (from the agent toward the target)
+        Vector3 desiredVelocity = Vector3.Normalize(target.position - agent.position) * desiredSpeed;
 
         // Calculate steering velocity
-        Vector3 steeringVelocity = desiredVelocity - agentVelocity;
+        Vector3 steeringVelocity = desiredVelocity - agent.velocity;
 
         // Apply steering velocity
-        agentVelocity += steeringVelocity;
+        agent.velocity += steeringVelocity;
 
         // Disable the target when we get close
-        if (offset.magnitude <= 1.01f)
+        if (distance <= 1.01f)
         {
             onArrival?.Invoke();
         }
 
-        // Apply velocity change
-        rigidbody.velocity = agentVelocity;
+        // Undo the change to the target position
+        target.position -= new Vector3(0, collider.bounds.extents.y, 0);
     }
 }
