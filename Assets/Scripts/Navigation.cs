@@ -53,7 +53,7 @@ public class Navigation : MonoBehaviour
 
     private void Start()
     {
-        m_nodes = ConnectNodes(GenerateNodes(GetColliders(ColliderContainer), Sphere, transform, Size, NodeSpacing), NodeSpacing, IgnoreLayer);
+        m_nodes = ConnectNodes(GenerateNodes(GetColliders(ColliderContainer), Sphere, transform, Size, NodeSpacing), NodeSpacing * 1.5f, IgnoreLayer);
     }
     
     private static List<Collider> GetColliders(GameObject container)
@@ -89,7 +89,7 @@ public class Navigation : MonoBehaviour
         return validNodes;
     }
 
-    private static List<Node> ConnectNodes(List<Node> nodeInput, float spacing, LayerMask ignoreLayer)
+    private static List<Node> ConnectNodes(List<Node> nodeInput, float radius, LayerMask ignoreLayer)
     {
         List<Node> nodes = nodeInput.ToList();
 
@@ -97,7 +97,7 @@ public class Navigation : MonoBehaviour
         {
             // Get a list of nodes which are within a certain radius of this node
             var nearNodes = nodes
-                .Where(n => (n.Position - current.Position).magnitude <= spacing * 1.5f)
+                .Where(n => (n.Position - current.Position).magnitude <= radius)
                 .Where(n => n != current);
 
             // Use raycasting to check if there is a valid connection to each nearby node
