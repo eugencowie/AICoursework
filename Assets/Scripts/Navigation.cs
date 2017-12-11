@@ -89,20 +89,27 @@ public class Navigation : MonoBehaviour
         return validNodes;
     }
 
-    private static List<Node> ConnectNodes(List<Node> nodes, float nodeSpacing, LayerMask ignoreLayer)
+    private static List<Node> ConnectNodes(List<Node> nodeInput, float spacing, LayerMask ignoreLayer)
     {
-        List<Node> result = nodes.ToList();
+        List<Node> nodes = nodeInput.ToList();
 
-        foreach (Node node in result)
+        foreach (Node current in nodes)
         {
-            var nearNodes = result.Where(n => n != node && (n.Position - node.Position).magnitude <= (nodeSpacing * 1.75f));
-            var nearConnections = nearNodes.Select(n => new Connection(n, (n.Position - node.Position).magnitude));
-            var validConnections = nearConnections.Where(c => !Physics.Linecast(node.Position, c.Node.Position, ~ignoreLayer) && !Physics.Linecast(c.Node.Position, node.Position, ~ignoreLayer));
+            // Get a list of nodes which are within a certain radius of this node
+            var nearNodes = nodes
+                .Where(n => n != current)
+                .Where(n => (n.Position - current.Position).magnitude <= spacing * 1.5f);
+            
+            // Create connections to 
+            var nearConnections = nearNodes
+                .Select(n => new Connection(n, (n.Position - current.Position).magnitude));
 
-            node.Connections.AddRange(validConnections);
+            var validConnections = nearConnections.Where(c => !Physics.Linecast(current.Position, c.Node.Position, ~ignoreLayer) && !Physics.Linecast(c.Node.Position, current.Position, ~ignoreLayer));
+
+            current.Connections.AddRange(validConnections);
         }
 
-        return result;
+        return nodes;
     }
 
     private void Update()
