@@ -668,9 +668,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c7bbed9eb3f3c643a041e0d57cfd537, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IgnoreLayer:
+    serializedVersion: 2
+    m_Bits: 4
   ColliderContainer: {fileID: 1657149600}
   Sphere: {fileID: 1821036629}
-  Size: {x: 55, y: 55}
+  Size: {x: 55, y: 0, z: 55}
   NodeSpacing: 2
 --- !u!1 &544276248
 GameObject:
