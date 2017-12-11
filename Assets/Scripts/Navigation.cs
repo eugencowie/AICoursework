@@ -61,26 +61,24 @@ public class Navigation : MonoBehaviour
         return container.transform.Cast<Transform>().Select(t => t.gameObject.GetComponent<Collider>()).Where(c => c != null && c.gameObject.GetComponent<Unit>() == null).ToList();
     }
 
-    /*private static List<Node> GenerateNodes(List<Collider> colliders, GameObject sphere, Transform transform, Vector3 size, float spacing)
+    private static List<Node> GenerateNodes(List<Collider> colliders, GameObject sphere, Transform transform, Vector3 size, float nodeSpacing)
     {
         List<Node> validNodes = new List<Node>();
-
-        // Calculate the offset required to center the grid
-        Vector3 pos = transform.position - (size / 2);
-        Vector3 end = pos + size;
         
-        for (; pos.z <= end.z; pos.z += spacing)
+        // Calculate the position to start the grid, taking into account that the grid should be centered
+        Vector3 start = transform.position - (size / 2);
+
+        // Calculate the position to end the grid
+        Vector3 end = start + size;
+        
+        for (Vector3 pos = start; pos.z <= end.z; pos.z += nodeSpacing)
         {
-            for (; pos.y <= end.y; pos.y += spacing)
+            for (pos.y = start.y; pos.y <= end.y; pos.y += nodeSpacing)
             {
-                for (; pos.x <= end.x; pos.x += spacing)
+                for (pos.x = start.x; pos.x <= end.x; pos.x += nodeSpacing)
                 {
-                    // If not interesting any other object, add the node to the list of valid nodes
                     if (!colliders.Any(c => c.bounds.Contains(pos)))
                     {
-                        GameObject newNode = Instantiate(sphere, transform);
-                        newNode.transform.position = pos;
-                        newNode.SetActive(true);
                         validNodes.Add(new Node(pos));
                     }
                 }
@@ -88,33 +86,6 @@ public class Navigation : MonoBehaviour
         }
 
         return validNodes;
-    }*/
-
-    private static List<Node> GenerateNodes(List<Collider> colliders, GameObject sphere, Transform transform, Vector3 size, float nodeSpacing)
-    {
-        List<Node> nodes = new List<Node>();
-        
-        // Calculate the offset required to center the grid
-        Vector3 globalOffset = -(size / 2);
-
-        for (float z = 0; z < size.z; z += nodeSpacing)
-        {
-            for (float x = 0; x < size.x; x += nodeSpacing)
-            {
-                Vector3 position = transform.position + globalOffset + new Vector3(x, 0, z);
-
-                if (!colliders.Any(c => c.bounds.Contains(position)))
-                {
-                    //GameObject newNode = Instantiate(sphere, transform);
-                    //newNode.transform.position = position;
-                    //newNode.SetActive(true);
-
-                    nodes.Add(new Node(position));
-                }
-            }
-        }
-
-        return nodes;
     }
 
     private static List<Node> ConnectNodes(List<Node> nodes, float nodeSpacing, LayerMask ignoreLayer)
@@ -125,7 +96,7 @@ public class Navigation : MonoBehaviour
         {
             var nearNodes = result.Where(n => n != node && (n.Position - node.Position).magnitude <= (nodeSpacing * 1.75f));
             var nearConnections = nearNodes.Select(n => new Connection(n, (n.Position - node.Position).magnitude));
-            var validConnections = nearConnections.Where(c => !Physics.Linecast(node.Position, c.Node.Position, ignoreLayer) && !Physics.Linecast(c.Node.Position, node.Position, ignoreLayer));
+            var validConnections = nearConnections.Where(c => !Physics.Linecast(node.Position, c.Node.Position, ~ignoreLayer) && !Physics.Linecast(c.Node.Position, node.Position, ~ignoreLayer));
 
             node.Connections.AddRange(validConnections);
         }
