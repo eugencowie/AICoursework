@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Input : MonoBehaviour
 {
+    public enum Formation { Point, SquareGrid, WeirdLine }
+
     public Navigation Navigation;
 
     public LayerMask GroundLayer;
+
+    public Formation FormationType;
 
     private List<Unit> m_selectedUnits = new List<Unit>();
 
@@ -56,9 +60,20 @@ public class Input : MonoBehaviour
                 {
                     targets = Formations.Point(m_selectedUnits, hit.point);
                 }
-                else
+                else switch (FormationType)
                 {
-                    targets = Formations.SquareGrid(m_selectedUnits, hit.point, 2.0f);
+                    case Formation.Point:
+                        targets = Formations.Point(m_selectedUnits, hit.point);
+                        break;
+
+                    case Formation.WeirdLine:
+                        targets = Formations.WeirdLine(m_selectedUnits, hit.point, 2.0f);
+                        break;
+
+                    default:
+                    case Formation.SquareGrid:
+                        targets = Formations.SquareGrid(m_selectedUnits, hit.point, 2.0f);
+                        break;
                 }
 
                 if (targets != null)

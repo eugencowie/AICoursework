@@ -867,6 +867,7 @@ MonoBehaviour:
   GroundLayer:
     serializedVersion: 2
     m_Bits: 256
+  FormationType: 1
 --- !u!4 &696066241
 Transform:
   m_ObjectHideFlags: 0
