@@ -4,56 +4,59 @@ using UnityEngine;
 [RequireComponent(typeof(Seek))]
 public class Unit : MonoBehaviour
 {
-    private Seek m_seek;
+    private Seek seek;
+    private bool selected;
 
-    private bool m_selected;
-
-    private List<Node> m_path = new List<Node>();
-    int m_pathIndex = 0;
-
-    public bool Selected
-    {
-        get { return m_selected; }
-        set { gameObject.SetColor((m_selected = value) ? Color.yellow : Color.white); }
-    }
+    private List<Node> path;
+    private int pathIndex;
 
     private void Start()
     {
-        m_seek = GetComponent<Seek>();
-        m_seek.onArrival = OnArrival;
-        m_selected = false;
-    }
-    
-    public void ToggleSelected()
-    {
-        Selected = !Selected;
+        seek = GetComponent<Seek>();
+        seek.onArrival = OnArrival;
+
+        selected = false;
+
+        path = new List<Node>();
+        pathIndex = 0;
     }
 
-    public void SetPath(List<Node> path)
+    private void OnArrival()
     {
-        m_path = path;
-        m_pathIndex = 0;
-        
-        if (m_path.Count > 0)
+        pathIndex++;
+
+        if (pathIndex < path.Count)
         {
-            SetTarget(m_path[m_pathIndex].Position);
+            SetTarget(path[pathIndex].Position);
+        }
+    }
+
+    public void SetPath(List<Node> newPath)
+    {
+        path = newPath;
+        pathIndex = 0;
+        
+        if (pathIndex < path.Count)
+        {
+            SetTarget(path[pathIndex].Position);
         }
     }
 
     private void SetTarget(Vector3 target)
     {
-        m_seek.target.transform.SetParent(gameObject.transform.parent);
-        m_seek.target.transform.position = target;
-        m_seek.target.gameObject.SetActive(true);
+        seek.target.transform.SetParent(gameObject.transform.parent);
+        seek.target.transform.position = target;
+        seek.target.gameObject.SetActive(true);
     }
 
-    private void OnArrival()
+    public bool Selected
     {
-        m_pathIndex++;
+        get { return selected; }
+        set { gameObject.SetColor((selected = value) ? Color.yellow : Color.white); }
+    }
 
-        if (m_pathIndex < m_path.Count)
-        {
-            SetTarget(m_path[m_pathIndex].Position);
-        }
+    public void ToggleSelected()
+    {
+        Selected = !Selected;
     }
 }

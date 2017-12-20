@@ -27,6 +27,24 @@ public class Seek : MonoBehaviour
         // Calculate the distance from the agent to the target
         float distance = Vector3.Magnitude(target.position - agent.position);
 
+        // Perform the steering behaviour
+        UpdateSteering();
+
+        // Undo the change to the target position
+        target.position -= new Vector3(0, collider.bounds.extents.y, 0);
+
+        // Disable the target when we get close
+        if (distance <= 1.01f)
+        {
+            onArrival?.Invoke();
+        }
+    }
+
+    private void UpdateSteering()
+    {
+        // Calculate the distance from the agent to the target
+        float distance = Vector3.Magnitude(target.position - agent.position);
+
         // Set the desired speed to max speed initially
         float desiredSpeed = maxSpeed;
 
@@ -35,23 +53,15 @@ public class Seek : MonoBehaviour
         {
             desiredSpeed = maxSpeed * (distance / arrivalRadius);
         }
-        
+
         // Calculate the desired velocity (from the agent toward the target)
-        Vector3 desiredVelocity = Vector3.Normalize(target.position - agent.position) * desiredSpeed;
+        Vector3 desiredVelocity =
+            Vector3.Normalize(target.position - agent.position) * desiredSpeed;
 
         // Calculate steering velocity
         Vector3 steeringVelocity = desiredVelocity - agent.velocity;
 
         // Apply steering velocity
         agent.velocity += steeringVelocity;
-
-        // Disable the target when we get close
-        if (distance <= 1.01f)
-        {
-            onArrival?.Invoke();
-        }
-
-        // Undo the change to the target position
-        target.position -= new Vector3(0, collider.bounds.extents.y, 0);
     }
 }

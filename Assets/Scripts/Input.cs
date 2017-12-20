@@ -54,11 +54,11 @@ public class Input : MonoBehaviour
                 List<Vector3> targets = null;
                 if (m_selectedUnits.Count < 2)
                 {
-                    targets = Point(m_selectedUnits, hit.point);
+                    targets = Formations.Point(m_selectedUnits, hit.point);
                 }
                 else
                 {
-                    targets = SquareGrid(m_selectedUnits, hit.point, 2.0f);
+                    targets = Formations.SquareGrid(m_selectedUnits, hit.point, 2.0f);
                 }
 
                 if (targets != null)
@@ -88,54 +88,5 @@ public class Input : MonoBehaviour
                 units.Remove(closest);
             }
         }
-    }
-
-    private static List<Vector3> Point(List<Unit> units, Vector3 target)
-    {
-        List<Vector3> targets = new List<Vector3>();
-        units.ForEach(u => targets.Add(target));
-        return targets;
-    }
-
-    private static List<Vector3> SquareGrid(List<Unit> units, Vector3 target, float distance)
-    {
-        int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
-
-        Vector3 start = new Vector3();
-        start.x = start.z = -((gridSize - 1) * distance) / 2;
-        Vector3 end = -start;
-
-        List<Vector3> targets = new List<Vector3>();
-
-        for (float z = start.z; z <= end.z; z += distance)
-        {
-            for (float x = start.x; x <= end.x; x += distance)
-            {
-                targets.Add(target + new Vector3(x, 0, z));
-            }
-        }
-
-        return targets;
-    }
-
-    private static List<Vector3> WeirdLine(List<Unit> units, Vector3 target, float distance)
-    {
-        int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
-
-        Vector3 start = new Vector3();
-        start.x = start.z = -(distance * gridSize);
-        Vector3 end = -start;
-
-        List<Vector3> targets = new List<Vector3>();
-
-        for (float z = start.z; z <= end.z; z += distance)
-        {
-            for (float x = start.x; x <= end.x; x += distance)
-            {
-                targets.Add(target + new Vector3(x, 0, z));
-            }
-        }
-
-        return targets;
     }
 }

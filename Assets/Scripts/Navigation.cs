@@ -140,70 +140,65 @@ public class Navigation : MonoBehaviour
         return nodes.OrderBy(n => (point - n.Position).sqrMagnitude).First();
     }
 
+    public static float Heuristic(Node current, Node target)
+    {
+        // Return the Euclidean distance from the current node to the target node
+        return (target.Position - current.Position).magnitude;
+    }
+
+    public static List<Node> TraversePath(Node current)
+    {
+        List<Node> path = new List<Node>();
+        while (current.Parent != null)
+        {
+            path.Insert(0, current);
+            current = current.Parent;
+        }
+        return path;
+    }
+
     public static List<Node> FindPath(List<Node> nodes, Node start, Node end)
     {
-        // Reset all nodes
-        nodes.ForEach(n => n.Reset());
+        nodes.ForEach(n => n.Reset());   // Reset all nodes
 
-        // Cost from start to start is zero
-        start.G = 0;
+        List<Node> closedList = new List<Node>(); // Nodes already evaluated
+        List<Node> openList = new List<Node>();   // Nodes discovered but not yet evaluated
 
-        // Heuristic
-        start.H = (end.Position - start.Position).magnitude;
-
-        // Nodes already evaluated
-        List<Node> closedList = new List<Node>();
-
-        // Discovered nodes not yet evaluated
-        List<Node> openList = new List<Node>();
-        openList.Add(start);
+        start.G = 0;                     // Initial cost at the start
+        start.H = Heuristic(start, end); // Heuristic from start to end
+        openList.Add(start);             // Add start node to open list to be evaluated
 
         while (openList.Count > 0)
         {
-            Node current = openList.OrderBy(n => n.F).First();
+            Node current = openList.OrderBy(n => n.F).First(); // Node with lowest total cost
 
-            if (current == end)
-            {
-                List<Node> path = new List<Node>();
-                while (current.Parent != null)
-                {
-                    path.Add(current);
-                    current = current.Parent;
-                }
-                path.Reverse();
-                return path;
-            }
+            openList.Remove(current); // Remove from open list as it is now being evaluated
+            closedList.Add(current);  // Add to closed list as it is now being evaluated
 
-            openList.Remove(current);
-            closedList.Add(current);
-            
+            if (current == end)               // If we have reached the end node
+                return TraversePath(current); // Return the path that we took to get here
+
             foreach (var connection in current.Connections)
             {
-                // Ignore if connection has already been evaluated
-                if (closedList.Contains(connection.Node))
-                {
-                    continue;
-                }
+                if (closedList.Contains(connection.Node)) // If connected node already evaluated
+                    continue;                             // Skip connection
+                
+                if (!openList.Contains(connection.Node)) // If connected node not on the open list
+                    openList.Add(connection.Node);       // Add connected node to open list
+                
+                float g = current.G + connection.Cost;   // Cost to get to the connected node
 
-                if (!openList.Contains(connection.Node))
-                {
-                    openList.Add(connection.Node);
-                }
+                if (g >= connection.Node.G) // If calculated cost is higher than cost of the node
+                    continue;               // Skip connection, not a better path to the node
 
-                float g = current.G + connection.Cost;
-
-                // This is not a better path
-                if (g >= connection.Node.G)
-                {
-                    continue;
-                }
-
-                connection.Node.Parent = current;
-                connection.Node.G = g;
-                connection.Node.H = (end.Position - connection.Node.Position).magnitude;
+                connection.Node.Parent = current;                    // Set parent to current node
+                connection.Node.G = g;                               // Set cost = calculated cost
+                connection.Node.H = Heuristic(connection.Node, end); // Heuristic from node to end
             }
         }
 
+        // If we have not found a path and there are no more
+        // nodes on the open list, just return the start node
         return new List<Node>(new Node[] { start });
     }
 
