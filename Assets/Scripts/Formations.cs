@@ -56,4 +56,39 @@ public static class Formations
 
         return targets;
     }
+
+    public static void SetTargets(Navigation navigation, List<Unit> units, List<Vector3> targets)
+    {
+        // Get the sum of all the units' positions 
+        Vector3 sum = units
+            .Select(u => u.gameObject.transform.position)
+            .Aggregate((a, b) => a + b);
+
+        // Find the center of the units by dividing the sum by the unit count
+        Vector3 center = sum / units.Count;
+
+        // Order the targets from furthest from the units to closest to the units
+        foreach (var t in targets.OrderByDescending(t => (t - center).sqrMagnitude))
+        {
+            // Get the unit which is closest to the target
+            Unit closestUnit = units.
+                OrderBy(u => (t - u.gameObject.transform.position).sqrMagnitude)
+                .FirstOrDefault();
+
+            if (closestUnit != null)
+            {
+                // Get the position of the closest unit
+                Vector3 closest = closestUnit.gameObject.transform.position;
+
+                // Find a path from the unit to the target
+                Node start = navigation.GetClosestNode(closest);
+                Node end = navigation.GetClosestNode(t);
+                List<Node> path = navigation.FindPath(start, end);
+                closestUnit.SetPath(path);
+
+                // Remove the unit from the list
+                units.Remove(closestUnit);
+            }
+        }
+    }
 }

@@ -78,29 +78,8 @@ public class Input : MonoBehaviour
 
                 if (targets != null)
                 {
-                    SetTargets(m_selectedUnits.ToList(), targets);
+                    Formations.SetTargets(Navigation, m_selectedUnits.ToList(), targets);
                 }
-            }
-        }
-    }
-
-    private void SetTargets(List<Unit> units, List<Vector3> targets)
-    {
-        Vector3 current = new Vector3();
-        units.ForEach(u => current += u.gameObject.transform.position);
-        current /= units.Count;
-
-        foreach (var t in targets.OrderByDescending(t => (t - current).sqrMagnitude))
-        {
-            Unit closest = units.OrderBy(u => (t - u.gameObject.transform.position).sqrMagnitude).FirstOrDefault();
-            if (closest != null)
-            {
-                Node start = Navigation.GetClosestNode(closest.gameObject.transform.position);
-                Node end = Navigation.GetClosestNode(t);
-                List<Node> path = Navigation.FindPath(start, end);
-
-                closest.SetPath(path);
-                units.Remove(closest);
             }
         }
     }
