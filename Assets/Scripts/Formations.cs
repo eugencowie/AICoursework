@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿//#define DEBUG_FORMATIONS
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -23,7 +25,7 @@ public static class Formations
     /// <summary>
     /// Assembling a Formation: Square Grid
     /// </summary>
-    public static List<Vector3> SquareGrid(List<Unit> units, Vector3 target, float spacing)
+    private static List<Vector3> SquareGridImpl(List<Unit> units, Vector3 target, float spacing)
     {
         // Get the size by taking the square root of the area of the grid and rounding up
         int gridSize = Mathf.CeilToInt(Mathf.Sqrt(units.Count));
@@ -119,4 +121,27 @@ public static class Formations
     }
 
     #endregion
+
+    public static List<Vector3> SquareGrid(List<Unit> units, Vector3 target, float spacing)
+    {
+        List<Vector3> result = null;
+
+#if DEBUG_FORMATIONS
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
+
+        result = SquareGridImpl(units, target, spacing);
+
+#if DEBUG_FORMATIONS
+        watch.Stop();
+        if (watch.Elapsed.TotalMilliseconds > 0)
+        {
+            Debug.Log("SquareGrid: " + watch.Elapsed.TotalMilliseconds + "ms");
+            using (System.IO.StreamWriter ss = System.IO.File.AppendText("squaregrid.csv"))
+                ss.WriteLine(watch.Elapsed.TotalMilliseconds.ToString());
+        }
+#endif
+
+        return result;
+    }
 }
