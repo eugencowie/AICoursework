@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define DEBUG_SEEK
+
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
@@ -28,8 +30,22 @@ public class Seek : MonoBehaviour
         // Calculate the distance from the agent to the target
         float distance = Vector3.Magnitude(target.position - agent.position);
 
+#if DEBUG_SEEK
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
+
         // Perform the steering behaviour
         UpdateSteering();
+
+#if DEBUG_SEEK
+        watch.Stop();
+        if (watch.Elapsed.TotalMilliseconds > 0)
+        {
+            Debug.Log("UpdateSteering: " + watch.Elapsed.TotalMilliseconds + "ms");
+            using (System.IO.StreamWriter ss = System.IO.File.AppendText("seek.csv"))
+                ss.WriteLine(watch.Elapsed.TotalMilliseconds.ToString());
+        }
+#endif
 
         // Undo the change to the target position
         target.position -= new Vector3(0, collider.bounds.extents.y, 0);

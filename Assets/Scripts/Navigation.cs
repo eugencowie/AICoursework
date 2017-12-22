@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿//#define DEBUG_NAVIGATION
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -53,7 +55,16 @@ public class Navigation : MonoBehaviour
 
     private void Start()
     {
+#if DEBUG_NAVIGATION
+        var startMemory = System.GC.GetTotalMemory(true);
+#endif
+        
         nodes = ConnectNodes(GenerateNodes(GetColliders(ColliderContainer), Sphere, transform, Size, NodeSpacing), NodeSpacing * 1.5f, IgnoreLayer);
+
+#if DEBUG_NAVIGATION
+        var endMemory = System.GC.GetTotalMemory(true);
+        Debug.Log("GenerateAndConnectNodes: " + (endMemory - startMemory) + " bytes");
+#endif
     }
     
     private static List<Collider> GetColliders(GameObject container)
@@ -228,5 +239,28 @@ public class Navigation : MonoBehaviour
     }
     
     public Node GetClosestNode(Vector3 point) => GetClosestNode(nodes, point);
-    public List<Node> FindPath(Node start, Node end) => FindPath(nodes, start, end);
+    //public List<Node> FindPath(Node start, Node end) => FindPath(nodes, start, end);
+
+    public List<Node> FindPath(Node start, Node end)
+    {
+        List<Node> result = null;
+
+#if DEBUG_NAVIGATION
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
+
+        result = FindPath(nodes, start, end);
+
+#if DEBUG_NAVIGATION
+        watch.Stop();
+        if (watch.Elapsed.TotalMilliseconds > 0)
+        {
+            Debug.Log("FindPath: " + watch.Elapsed.TotalMilliseconds + "ms");
+            using (System.IO.StreamWriter ss = System.IO.File.AppendText("findpath.csv"))
+                ss.WriteLine(watch.Elapsed.TotalMilliseconds.ToString());
+        }
+#endif
+
+        return result;
+    }
 }
