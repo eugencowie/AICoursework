@@ -49,11 +49,11 @@ public class Navigation : MonoBehaviour
     public Vector3 Size = new Vector3(55, 0, 55);
     public float NodeSpacing = 0.5f;
     
-    private List<Node> m_nodes = new List<Node>();
+    private List<Node> nodes = new List<Node>();
 
     private void Start()
     {
-        m_nodes = ConnectNodes(GenerateNodes(GetColliders(ColliderContainer), Sphere, transform, Size, NodeSpacing), NodeSpacing * 1.5f, IgnoreLayer);
+        nodes = ConnectNodes(GenerateNodes(GetColliders(ColliderContainer), Sphere, transform, Size, NodeSpacing), NodeSpacing * 1.5f, IgnoreLayer);
     }
     
     private static List<Collider> GetColliders(GameObject container)
@@ -64,6 +64,18 @@ public class Navigation : MonoBehaviour
             .ToList();
     }
 
+    public static Node GetClosestNode(List<Node> nodes, Vector3 point)
+    {
+        return nodes
+            .OrderBy(n => (point - n.Position).sqrMagnitude)
+            .First();
+    }
+
+    #region Pathfinding: Discretisation
+
+    /// <summary>
+    /// Pathfinding: Discretisation
+    /// </summary>
     private static List<Node> GenerateNodes(List<Collider> colliders, GameObject sphere, Transform transform, Vector3 size, float nodeSpacing)
     {
         List<Node> validNodes = new List<Node>();
@@ -91,7 +103,10 @@ public class Navigation : MonoBehaviour
 
         return validNodes;
     }
-
+    
+    /// <summary>
+    /// Pathfinding: Discretisation
+    /// </summary>
     private static List<Node> ConnectNodes(List<Node> nodeInput, float radius, LayerMask ignoreLayer)
     {
         List<Node> nodes = nodeInput.ToList();
@@ -119,44 +134,22 @@ public class Navigation : MonoBehaviour
         return nodes;
     }
 
-    private void Update()
-    {
-        DrawDebugLines();
-    }
+    #endregion
 
-    private void DrawDebugLines()
-    {
-        foreach (var node in m_nodes)
-        {
-            foreach (var connection in node.Connections)
-            {
-                Debug.DrawLine(node.Position, connection.Node.Position, Color.green);
-            }
-        }
-    }
+    #region Pathfinding: Search
 
-    public static Node GetClosestNode(List<Node> nodes, Vector3 point)
-    {
-        return nodes.OrderBy(n => (point - n.Position).sqrMagnitude).First();
-    }
-
+    /// <summary>
+    /// Pathfinding: Search
+    /// </summary>
     public static float Heuristic(Node current, Node target)
     {
         // Return the Euclidean distance from the current node to the target node
         return (target.Position - current.Position).magnitude;
     }
 
-    public static List<Node> TraversePath(Node current)
-    {
-        List<Node> path = new List<Node>();
-        while (current.Parent != null)
-        {
-            path.Insert(0, current);
-            current = current.Parent;
-        }
-        return path;
-    }
-
+    /// <summary>
+    /// Pathfinding: Search
+    /// </summary>
     public static List<Node> FindPath(List<Node> nodes, Node start, Node end)
     {
         nodes.ForEach(n => n.Reset());   // Reset all nodes
@@ -202,6 +195,38 @@ public class Navigation : MonoBehaviour
         return new List<Node>(new Node[] { start });
     }
 
-    public Node GetClosestNode(Vector3 point) => GetClosestNode(m_nodes, point);
-    public List<Node> FindPath(Node start, Node end) => FindPath(m_nodes, start, end);
+    /// <summary>
+    /// Pathfinding: Search
+    /// </summary>
+    public static List<Node> TraversePath(Node current)
+    {
+        List<Node> path = new List<Node>();
+        while (current.Parent != null)
+        {
+            path.Insert(0, current);
+            current = current.Parent;
+        }
+        return path;
+    }
+
+    #endregion
+
+    private void Update()
+    {
+        DrawDebugLines();
+    }
+
+    private void DrawDebugLines()
+    {
+        foreach (var node in nodes)
+        {
+            foreach (var connection in node.Connections)
+            {
+                Debug.DrawLine(node.Position, connection.Node.Position, Color.green);
+            }
+        }
+    }
+    
+    public Node GetClosestNode(Vector3 point) => GetClosestNode(nodes, point);
+    public List<Node> FindPath(Node start, Node end) => FindPath(nodes, start, end);
 }

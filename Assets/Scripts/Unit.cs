@@ -5,22 +5,25 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     private Seek seek;
-    private bool selected;
+    private bool selected = false;
 
-    private List<Node> path;
-    private int pathIndex;
+    #region Following a Path
 
+    private List<Node> path = new List<Node>();
+    private int pathIndex = 0;
+
+    /// <summary>
+    /// Following a Path
+    /// </summary>
     private void Start()
     {
         seek = GetComponent<Seek>();
         seek.onArrival = OnArrival;
-
-        selected = false;
-
-        path = new List<Node>();
-        pathIndex = 0;
     }
 
+    /// <summary>
+    /// Following a Path
+    /// </summary>
     private void OnArrival()
     {
         pathIndex++;
@@ -30,6 +33,8 @@ public class Unit : MonoBehaviour
             SetTarget(path[pathIndex].Position);
         }
     }
+
+    #endregion
 
     public void SetPath(List<Node> newPath)
     {

@@ -7,12 +7,10 @@ public class Input : MonoBehaviour
     public enum Formation { Point, SquareGrid, WeirdLine }
 
     public Navigation Navigation;
-
     public LayerMask GroundLayer;
-
     public Formation FormationType;
 
-    private List<Unit> m_selectedUnits = new List<Unit>();
+    private List<Unit> selectedUnits = new List<Unit>();
 
     private void Update()
     {
@@ -36,11 +34,11 @@ public class Input : MonoBehaviour
 
                     if (unitController.Selected)
                     {
-                        m_selectedUnits.Add(unitController);
+                        selectedUnits.Add(unitController);
                     }
                     else
                     {
-                        m_selectedUnits.Remove(unitController);
+                        selectedUnits.Remove(unitController);
                     }
                 }
             }
@@ -53,32 +51,32 @@ public class Input : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, GroundLayer) && m_selectedUnits.Any())
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, GroundLayer) && selectedUnits.Any())
             {
                 List<Vector3> targets = null;
-                if (m_selectedUnits.Count < 2)
+                if (selectedUnits.Count < 2)
                 {
-                    targets = Formations.Point(m_selectedUnits, hit.point);
+                    targets = Formations.Point(selectedUnits, hit.point);
                 }
                 else switch (FormationType)
                 {
                     case Formation.Point:
-                        targets = Formations.Point(m_selectedUnits, hit.point);
+                        targets = Formations.Point(selectedUnits, hit.point);
                         break;
 
                     case Formation.WeirdLine:
-                        targets = Formations.WeirdLine(m_selectedUnits, hit.point, 2.0f);
+                        targets = Formations.WeirdLine(selectedUnits, hit.point, 2.0f);
                         break;
 
                     default:
                     case Formation.SquareGrid:
-                        targets = Formations.SquareGrid(m_selectedUnits, hit.point, 2.0f);
+                        targets = Formations.SquareGrid(selectedUnits, hit.point, 2.0f);
                         break;
                 }
 
                 if (targets != null)
                 {
-                    Formations.SetTargets(Navigation, m_selectedUnits.ToList(), targets);
+                    Formations.SetTargets(Navigation, selectedUnits.ToList(), targets);
                 }
             }
         }

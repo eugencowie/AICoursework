@@ -4,6 +4,11 @@ using UnityEngine;
 
 public static class Formations
 {
+    #region Assembling a Formation: Point
+
+    /// <summary>
+    /// Assembling a Formation: Point
+    /// </summary>
     public static List<Vector3> Point(List<Unit> units, Vector3 target)
     {
         // Return a list of targets by taking the list of units and selecting the
@@ -11,6 +16,13 @@ public static class Formations
         return units.Select(_ => target).ToList();
     }
 
+    #endregion
+
+    #region Assembling a Formation: Square Grid
+
+    /// <summary>
+    /// Assembling a Formation: Square Grid
+    /// </summary>
     public static List<Vector3> SquareGrid(List<Unit> units, Vector3 target, float spacing)
     {
         // Get the size by taking the square root of the area of the grid and rounding up
@@ -34,6 +46,13 @@ public static class Formations
         return targets;
     }
 
+    #endregion
+
+    #region Assembling a Formation: Weird Line
+
+    /// <summary>
+    /// Assembling a Formation: Weird Line
+    /// </summary>
     public static List<Vector3> WeirdLine(List<Unit> units, Vector3 target, float spacing)
     {
         // Get the size by taking the square root of the area of the grid and rounding up
@@ -57,6 +76,13 @@ public static class Formations
         return targets;
     }
 
+    #endregion
+
+    #region Group Movement in Formation
+
+    /// <summary>
+    /// Group Movement in Formation
+    /// </summary>
     public static void SetTargets(Navigation navigation, List<Unit> units, List<Vector3> targets)
     {
         // Get the sum of all the units' positions 
@@ -91,4 +117,6 @@ public static class Formations
             }
         }
     }
+
+    #endregion
 }

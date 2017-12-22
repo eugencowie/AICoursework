@@ -21,7 +21,8 @@ public class Seek : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Set the target position above the actual target to take into account the agent's distance from the floor
+        // Temporarily set the target position above the actual target to
+        // take into account the agent's distance from the floor
         target.position += new Vector3(0, collider.bounds.extents.y, 0);
 
         // Calculate the distance from the agent to the target
@@ -40,6 +41,11 @@ public class Seek : MonoBehaviour
         }
     }
 
+    #region Individual Unit Movement
+
+    /// <summary>
+    /// Individual Unit Movement
+    /// </summary>
     private void UpdateSteering()
     {
         // Calculate the distance from the agent to the target
@@ -64,4 +70,6 @@ public class Seek : MonoBehaviour
         // Apply steering velocity
         agent.velocity += steeringVelocity;
     }
+
+    #endregion
 }
